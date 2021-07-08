@@ -19,7 +19,7 @@ public class SAImageFetcher {
     private let urlRequestBuilder = NetworkRequestBuilder()
     
     /// NSCache object used to cache image for key
-    static let cache = NSCache<NSString, UIImage>()
+    public static let cache = NSCache<NSString, UIImage>()
     
     public func fetchImage(url: URL?, completionHandler: @escaping (Result<UIImage, ImageFetcherError>) -> Void) {
         

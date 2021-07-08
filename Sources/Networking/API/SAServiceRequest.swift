@@ -9,7 +9,7 @@ import UIKit
 
 public typealias serviceRequestCompletionHandler = (Decodable?) -> Void
 
-protocol SAServiceRequest: SAURLBuilder {
+public protocol SAServiceRequest: SAURLBuilder {
     
     var contentFetcher: ContentFetcherProtocol? { get }
     
@@ -22,9 +22,9 @@ protocol SAServiceRequest: SAURLBuilder {
     
 }
 
-extension SAServiceRequest {
+public extension SAServiceRequest {
     
-    public func requestData<model: Decodable>(model m: model.Type,
+    func requestData<model: Decodable>(model m: model.Type,
                                        completionHandler: @escaping serviceRequestCompletionHandler) throws -> Void {
         
         try self.requestData(withParameters: [:],
@@ -33,7 +33,7 @@ extension SAServiceRequest {
         
     }
     
-    public func requestData<model: Decodable>(withParameters parameters: [String: String],
+    func requestData<model: Decodable>(withParameters parameters: [String: String],
                                        model m:  model.Type,
                                        completionHandler: @escaping serviceRequestCompletionHandler) throws -> Void {
         
