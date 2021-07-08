@@ -16,11 +16,15 @@ public enum ImageFetcherError: Error {
 
 public class SAImageFetcher {
     
-    private let urlRequestBuilder = NetworkRequestBuilder()
+    private let urlRequestBuilder: NetworkRequestBuilder
     
     /// NSCache object used to cache image for key
     public static let cache = NSCache<NSString, UIImage>()
-    
+
+    public init() {
+        self.urlRequestBuilder = NetworkRequestBuilder()
+    }
+
     public func fetchImage(url: URL?, completionHandler: @escaping (Result<UIImage, ImageFetcherError>) -> Void) {
         
         guard let url = url else {
