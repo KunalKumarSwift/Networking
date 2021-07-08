@@ -1,0 +1,10 @@
+/* 
+  NetworkResponse.strings
+  SampleApp
+
+  Created by Kunal Kumar on 2020-10-07.
+  
+*/
+
+"NETWORK_RESPONSE_404" = "Something went wrong. Please come back later.";
+"NETWORK_RESPONSE_OTHER" = "Unable to complete the request. Please try again later.";
