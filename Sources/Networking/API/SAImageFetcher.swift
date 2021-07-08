@@ -9,19 +9,19 @@ import Foundation
 import UIKit.UIImage
 
 /// Error to be displayed when image downloading fails
-enum ImageFetcherError: Error {
+public enum ImageFetcherError: Error {
     case imageURLNil
     case unableToFetchImage
 }
 
-class SAImageFetcher {
+public class SAImageFetcher {
     
     private let urlRequestBuilder = NetworkRequestBuilder()
     
     /// NSCache object used to cache image for key
     static let cache = NSCache<NSString, UIImage>()
     
-    func fetchImage(url: URL?, completionHandler: @escaping (Result<UIImage, ImageFetcherError>) -> Void) {
+    public func fetchImage(url: URL?, completionHandler: @escaping (Result<UIImage, ImageFetcherError>) -> Void) {
         
         guard let url = url else {
             completionHandler(.failure(ImageFetcherError.imageURLNil))

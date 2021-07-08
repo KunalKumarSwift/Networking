@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum SANetworkConstant {
+public enum SANetworkConstant {
     static let baseURL: String = "api.nasa.gov"
     static let timeout: Double = 30.0
     static let successfulResponseLowerRange = 200

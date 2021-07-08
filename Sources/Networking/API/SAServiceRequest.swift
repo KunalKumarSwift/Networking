@@ -7,7 +7,7 @@
 
 import UIKit
 
-typealias serviceRequestCompletionHandler = (Decodable?) -> Void
+public typealias serviceRequestCompletionHandler = (Decodable?) -> Void
 
 protocol SAServiceRequest: SAURLBuilder {
     
@@ -24,7 +24,7 @@ protocol SAServiceRequest: SAURLBuilder {
 
 extension SAServiceRequest {
     
-    func requestData<model: Decodable>(model m: model.Type,
+    public func requestData<model: Decodable>(model m: model.Type,
                                        completionHandler: @escaping serviceRequestCompletionHandler) throws -> Void {
         
         try self.requestData(withParameters: [:],
@@ -33,7 +33,7 @@ extension SAServiceRequest {
         
     }
     
-    func requestData<model: Decodable>(withParameters parameters: [String: String],
+    public func requestData<model: Decodable>(withParameters parameters: [String: String],
                                        model m:  model.Type,
                                        completionHandler: @escaping serviceRequestCompletionHandler) throws -> Void {
         

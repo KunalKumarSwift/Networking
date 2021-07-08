@@ -7,13 +7,13 @@
 
 import Foundation
 
-typealias completionHandler = (Result<Data, SARequestError>) -> Void
+public typealias completionHandler = (Result<Data, SARequestError>) -> Void
 
-protocol ContentFetcherProtocol {
+public protocol ContentFetcherProtocol {
     func requestContent(request: URLRequest?, completionHandler: @escaping completionHandler)
 }
 
-class SAContentFetcher: NSObject, ContentFetcherProtocol {
+public class SAContentFetcher: NSObject, ContentFetcherProtocol {
     
     // MARK: Public methods
     
@@ -30,11 +30,11 @@ class SAContentFetcher: NSObject, ContentFetcherProtocol {
      */
     
     // shared Instance of LDContentFetcher.
-    static let shared = SAContentFetcher()
+    public static let shared = SAContentFetcher()
     
     private override init() {}
     
-    func requestContent(request: URLRequest?, completionHandler: @escaping completionHandler) {
+    public func requestContent(request: URLRequest?, completionHandler: @escaping completionHandler) {
         
         // Creating a session
         let session = URLSession.shared

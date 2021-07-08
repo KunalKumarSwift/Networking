@@ -8,7 +8,7 @@
 import Foundation
 
 /// Protocol to design a new URL Request.
-protocol RequestBuilder {
+public protocol RequestBuilder {
     /// Building a request with a URL
     func buildURLRequest(withURL url: URL) -> URLRequest
     /// Building a request with a SAURLBuilder and parameters.
@@ -21,7 +21,7 @@ public enum BuilderError: Error {
     case unableBuildURL(message: String)
 }
 
-class NetworkRequestBuilder: RequestBuilder {
+public class NetworkRequestBuilder: RequestBuilder {
 
     /**
      Building a request with a URL
@@ -31,7 +31,7 @@ class NetworkRequestBuilder: RequestBuilder {
      
      - Returns: URLRequest.
      */
-    func buildURLRequest(withURL url: URL) -> URLRequest {
+    public func buildURLRequest(withURL url: URL) -> URLRequest {
         
         return URLRequest(url: url,
                           cachePolicy: URLRequest.CachePolicy.reloadRevalidatingCacheData,
@@ -47,7 +47,7 @@ class NetworkRequestBuilder: RequestBuilder {
      - andParameters: The parameters for request.
      - Returns: URLRequest.
      */
-    func buildURLRequest<T: SAURLBuilder>(withURLBuilder urlBuilder: T, andParameters parameters: [String: String]) throws -> URLRequest {
+    public func buildURLRequest<T: SAURLBuilder>(withURLBuilder urlBuilder: T, andParameters parameters: [String: String]) throws -> URLRequest {
         
         var components = URLComponents()
         if let httpMethod = urlBuilder.httpMethod {

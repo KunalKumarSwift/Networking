@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol SAURLBuilder {
+public protocol SAURLBuilder {
     // End point for the request
     var endPoint: String { get }
     
