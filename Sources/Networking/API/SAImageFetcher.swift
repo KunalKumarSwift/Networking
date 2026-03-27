@@ -9,54 +9,50 @@ import Foundation
 import UIKit.UIImage
 
 /// Error to be displayed when image downloading fails
-public enum ImageFetcherError: Error {
+public enum ImageFetcherError: Error, Sendable {
     case imageURLNil
     case unableToFetchImage
 }
 
-public class SAImageFetcher {
-    
+@MainActor
+public final class SAImageFetcher {
+
     private let urlRequestBuilder: NetworkRequestBuilder
-    
-    /// NSCache object used to cache image for key
+
+    /// NSCache object used to cache images by URL key
     public static let cache = NSCache<NSString, UIImage>()
 
     public init() {
         self.urlRequestBuilder = NetworkRequestBuilder()
     }
 
-    public func fetchImage(url: URL?, completionHandler: @escaping (Result<UIImage, ImageFetcherError>) -> Void) {
-        
+    /**
+     Fetches an image from the given URL, returning a cached copy if available.
+
+     - Parameters:
+       - url: The URL of the image to fetch.
+
+     - Returns: The fetched `UIImage`.
+
+     - Throws: `ImageFetcherError`
+     */
+    public func fetchImage(url: URL?) async throws -> UIImage {
         guard let url = url else {
-            completionHandler(.failure(ImageFetcherError.imageURLNil))
-            return
+            throw ImageFetcherError.imageURLNil
         }
-        
-        if let cachedImage = type(of: self).cache.object(forKey: url.absoluteString as NSString) {
-            // we have image
-            print("image found at cache -- URL == \(url.absoluteString)")
-            completionHandler(.success(cachedImage))
-            return
+
+        if let cachedImage = SAImageFetcher.cache.object(forKey: url.absoluteString as NSString) {
+            return cachedImage
         }
-        
+
         let urlRequest = urlRequestBuilder.buildURLRequest(withURL: url)
-        
-        SAContentFetcher.shared.requestContent(request: urlRequest) { (result) in
-            
-            switch result {
-                
-            case .success(let data):
-                guard let image = UIImage(data: data) else {
-                    completionHandler(.failure(ImageFetcherError.unableToFetchImage))
-                    return
-                }
-                
-                type(of: self).cache.setObject(image, forKey: url.absoluteString as NSString)
-                completionHandler(.success(image))
-                
-            case .failure( _):
-                completionHandler(.failure(ImageFetcherError.unableToFetchImage))
-            }
+        let (data, _) = try await URLSession.shared.data(for: urlRequest)
+
+        guard let image = UIImage(data: data) else {
+            throw ImageFetcherError.unableToFetchImage
         }
+
+        SAImageFetcher.cache.setObject(image, forKey: url.absoluteString as NSString)
+        return image
     }
 }
