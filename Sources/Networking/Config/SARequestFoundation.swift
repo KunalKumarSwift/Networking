@@ -40,7 +40,7 @@ public enum SARequestType: String, Sendable {
     case DELETE
 }
 
-public enum SARequestError: Error, Sendable {
+public enum SARequestError: Error, Sendable, Equatable {
     // 404 Encountered.
     case encountered404
 

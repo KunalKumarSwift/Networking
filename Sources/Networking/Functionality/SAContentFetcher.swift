@@ -13,10 +13,19 @@ public protocol ContentFetcherProtocol: Sendable {
 
 public final class SAContentFetcher: ContentFetcherProtocol {
 
+    private let session: URLSession
+
     // shared Instance of SAContentFetcher.
     public static let shared = SAContentFetcher()
 
-    private init() {}
+    private init() {
+        self.session = .shared
+    }
+
+    // Internal init for testing with a mock URLSession.
+    init(session: URLSession) {
+        self.session = session
+    }
 
     /**
      Send out request to a URL and return the response data.
@@ -29,7 +38,7 @@ public final class SAContentFetcher: ContentFetcherProtocol {
      - Throws: `SARequestError`
      */
     public func requestContent(request: URLRequest) async throws -> Data {
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, response) = try await session.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw SARequestError.otherError(errorCode: -1)

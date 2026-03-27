@@ -6,10 +6,10 @@
 //
 
 import Foundation
-import UIKit.UIImage
+@preconcurrency import UIKit.UIImage
 
 /// Error to be displayed when image downloading fails
-public enum ImageFetcherError: Error, Sendable {
+public enum ImageFetcherError: Error, Sendable, Equatable {
     case imageURLNil
     case unableToFetchImage
 }
@@ -18,12 +18,22 @@ public enum ImageFetcherError: Error, Sendable {
 public final class SAImageFetcher {
 
     private let urlRequestBuilder: NetworkRequestBuilder
+    private let session: URLSession
 
-    /// NSCache object used to cache images by URL key
-    public static let cache = NSCache<NSString, UIImage>()
+    /// NSCache object used to cache images by URL key.
+    /// NSCache is internally thread-safe; nonisolated(unsafe) lets callers
+    /// read/clear it from any context.
+    nonisolated(unsafe) public static let cache = NSCache<NSString, UIImage>()
 
     public init() {
         self.urlRequestBuilder = NetworkRequestBuilder()
+        self.session = .shared
+    }
+
+    // Internal init for testing with a mock URLSession.
+    init(session: URLSession) {
+        self.urlRequestBuilder = NetworkRequestBuilder()
+        self.session = session
     }
 
     /**
@@ -46,7 +56,7 @@ public final class SAImageFetcher {
         }
 
         let urlRequest = urlRequestBuilder.buildURLRequest(withURL: url)
-        let (data, _) = try await URLSession.shared.data(for: urlRequest)
+        let (data, _) = try await session.data(for: urlRequest)
 
         guard let image = UIImage(data: data) else {
             throw ImageFetcherError.unableToFetchImage
