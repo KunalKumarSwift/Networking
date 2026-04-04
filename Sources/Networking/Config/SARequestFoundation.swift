@@ -7,31 +7,29 @@
 
 import Foundation
 
-public protocol SAURLBuilder {
+public protocol SAURLBuilder: Sendable {
     // End point for the request
     var endPoint: String { get }
-    
+
     // Http Method to be used.
     var httpMethod: SAHttpMethod? { get }
-    
+
     // http method for communication. eg. PUT, POST, DELETE, GET
     var requestType: SARequestType? { get }
-    
 }
 
-public enum SAHttpMethod: String {
+public enum SAHttpMethod: String, Sendable {
     // Use https for request
     case https
-    
+
     // Use http for the request
     case http
-    
 }
 
-public enum SARequestType: String {
+public enum SARequestType: String, Sendable {
     // Use GET Method
     case GET
-    
+
     // Use POST Method
     case POST
 
@@ -40,14 +38,12 @@ public enum SARequestType: String {
 
     // Use DELETE Method
     case DELETE
-    
 }
 
-public enum SARequestError: Error {
+public enum SARequestError: Error, Sendable, Equatable {
     // 404 Encountered.
     case encountered404
-    
+
     // Other error encountered.
     case otherError(errorCode: Int)
-    
 }

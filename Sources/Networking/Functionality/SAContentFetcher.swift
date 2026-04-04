@@ -7,67 +7,50 @@
 
 import Foundation
 
-public typealias completionHandler = (Result<Data, SARequestError>) -> Void
-
-public protocol ContentFetcherProtocol {
-    func requestContent(request: URLRequest?, completionHandler: @escaping completionHandler)
+public protocol ContentFetcherProtocol: Sendable {
+    func requestContent(request: URLRequest) async throws -> Data
 }
 
-public class SAContentFetcher: NSObject, ContentFetcherProtocol {
-    
-    // MARK: Public methods
-    
+public final class SAContentFetcher: ContentFetcherProtocol {
+
+    private let session: URLSession
+
+    // shared Instance of SAContentFetcher.
+    public static let shared = SAContentFetcher()
+
+    private init() {
+        self.session = .shared
+    }
+
+    // Internal init for testing with a mock URLSession.
+    init(session: URLSession) {
+        self.session = session
+    }
+
     /**
-     Send out request to a URL providing a completion handler.
-     
+     Send out request to a URL and return the response data.
+
      - Parameters:
-     - request: The URLRequest required to send out the request.
-     - completionHandler: The completion handler that handles the response and error.
-     
-     - Returns: Void.
-     
+       - request: The URLRequest required to send out the request.
+
+     - Returns: The raw `Data` from the response.
+
      - Throws: `SARequestError`
      */
-    
-    // shared Instance of LDContentFetcher.
-    public static let shared = SAContentFetcher()
-    
-    private override init() {}
-    
-    public func requestContent(request: URLRequest?, completionHandler: @escaping completionHandler) {
-        
-        // Creating a session
-        let session = URLSession.shared
-        
-        let task = session.dataTask(with: request!) { (data, response, error) in
-            
-            // Check if request returns an error.
-            if let localError = error as NSError? {
-                
-                switch localError.code {
-                    
-                default:
-                    completionHandler(.failure(SARequestError.otherError(errorCode: localError.code)))
-                    
-                }
-                return
-            }
-            
-            // Request does not return error.
-            if let localData = data, let urlResponse = response as? HTTPURLResponse {
-                
-                switch urlResponse.statusCode {
-                    
-                case SANetworkConstant.successfulResponseLowerRange, SANetworkConstant.successfulResponseUpperRange:
-                    completionHandler(.success(localData))
-                case SANetworkConstant.resourceNotFound:
-                     completionHandler(.failure(SARequestError.encountered404))
-                default:
-                    completionHandler(.failure(SARequestError.otherError(errorCode: urlResponse.statusCode)))
-                    
-                }
-            }
+    public func requestContent(request: URLRequest) async throws -> Data {
+        let (data, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw SARequestError.otherError(errorCode: -1)
         }
-        task.resume()
+
+        switch httpResponse.statusCode {
+        case SANetworkConstant.successfulResponseLowerRange...SANetworkConstant.successfulResponseUpperRange:
+            return data
+        case SANetworkConstant.resourceNotFound:
+            throw SARequestError.encountered404
+        default:
+            throw SARequestError.otherError(errorCode: httpResponse.statusCode)
+        }
     }
 }
